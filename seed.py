@@ -51,7 +51,7 @@ try:
     )
     cursor = conn.cursor()
     
-    sqt_create_users = "CREATE TABLE if not exists users (id SERIAL PRIMARY key, fullname VARCHAR(100) UNIQUE, email VARCHAR(100) unique);"
+    sqt_create_users = "CREATE TABLE if not exists users (id SERIAL PRIMARY key, fullname VARCHAR(100), email VARCHAR(100) unique);"
     sql_crete_status = "CREATE TABLE IF NOT EXISTS status (id SERIAL primary key,name VARCHAR(50) unique);"
     sql_create_tasks = "create table if not exists tasks (id serial primary key, title varchar(100), description text, status_id INTEGER,	foreign key (status_id) REFERENCES status (id),	user_id INTEGER,	foreign key (user_id) REFERENCES users (id) on delete cascade);"
     sql_status = "INSERT INTO status (name) VALUES ('New'), ('In Progress'), ('Completed');"
@@ -262,9 +262,9 @@ def change_status(): #3
         cursor = conn.cursor()
         
         id=input("Input task ID: ")
-        stat_id=input("Input new status. 1 for New, 2 for In Progree, 3 for Completed: ")
+        stat_name=input("Input new status: ")
         if if_task_exists(id):
-            sql = f"UPDATE tasks SET status_id = {stat_id} WHERE id = {id}"
+            sql = f"UPDATE tasks SET status_id = (SELECT id FROM status WHERE name = '{stat_name}') WHERE id = {id}"
             cursor.execute(sql)
             sql1 = f"SELECT t.id, t.title, t.description, s.name, u.fullname  FROM tasks as t  left join users as u on u.id = t.user_id LEFT JOIN status as s ON  s.id= t.status_id where t.id = {id}"
             cursor.execute(sql1)
